@@ -1,0 +1,36 @@
+docker:
+  image:
+    repo: "main"
+    name: "main"
+    tag: "latest"
+redis_addr: "main-redis-master"
+cadvisor:
+  container:
+    port: 8081
+redis:
+  auth:
+    enabled: false
+  master:
+    count: 1
+  replica:
+    replicaCount: 0
+prometheus:
+  serverFiles:
+    scrape_configs:
+    - job_name: "cadvisor"
+      static_configs:
+        - targets: ["cadvisor:8081"]
+  server:
+    service:
+      type: "NodePort"
+grafana:
+  service:
+    type: "NodePort"
+  datasources:
+    datasources.yaml:
+      datasources:
+      - name: "prometheus"
+        type: "prometheus"
+        url: "http://main-prometheus-server"
+        access: "proxy"
+        isDefault: true

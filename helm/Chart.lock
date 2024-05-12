@@ -1,0 +1,15 @@
+dependencies:
+- name: redis
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 19.3.0
+- name: cadvisor
+  repository: https://ckotzbauer.github.io/helm-charts
+  version: 2.3.3
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 25.21.0
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 7.3.11
+digest: sha256:8fcf1cda4b7f408a0f1ab9b179dcfeb539eacfd18c776de34e18ee13f6559a33
+generated: "2024-05-12T18:08:09.80120072+03:00"

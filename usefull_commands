@@ -1,0 +1,4 @@
+kubectl get secret main-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+watch kubectl get all -A
+minikube service main-grafana  --url
+helm upgrade -i main .
