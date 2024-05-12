@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      REDIS_ADDR: redis:6379
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+#for monitoring
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:latest
+    network_mode: "host"
+    ports:
+      - "8081:8081"
+    volumes: 
+      - "/:/rootfs"
+      - "/var/run:/var/run"
+      - "/sys:/sys"
+      - "/var/lib/docker/:/var/lib/docker"
+      - "/dev/disk/:/dev/disk"
+    privileged: true
+    devices: 
+      - "/dev/kmsg"
+    command:
+    - '-port=8081'
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes: 
+      - "./prom/prometheus.yml:/etc/prometheus/prometheus.yml"
+    privileged: true
+    depends_on:
+      - cadvisor
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    network_mode: "host"
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - DS_PROMETHEUS=prometheus
+    volumes: 
+      - "grafana-data:/var/lib/grafana"
+      - "./prom/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml"
+      - "./prom/dashboard.json:/var/lib/grafana/dashboards/dashboard.json"
+      - "./prom/default.yaml:/etc/grafana/provisioning/dashboards/default.yaml"
+    privileged: true
+    depends_on:
+      - prometheus
+volumes:
+  grafana-data:
